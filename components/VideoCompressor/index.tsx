@@ -67,12 +67,13 @@ export default function Component() {
 
     console.log("compressionParams", compressionParams);
 
+    const start = Date.now();
+    console.log("start", start);
+
     ffmpeg.on("progress", ({ progress }) => {
       setProgress(Math.round(progress * 100));
     });
-
-    const start = Date.now();
-    await ffmpeg.exec([...compressionParams, outputFileName]);
+    await ffmpeg.exec(compressionParams);
     const end = Date.now();
     console.log(`Compression took ${(end - start) / 1000} seconds`);
     const data = await ffmpeg.readFile(outputFileName);
