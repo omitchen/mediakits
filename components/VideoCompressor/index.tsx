@@ -3,6 +3,20 @@ import { fetchFile, toBlobURL } from "@ffmpeg/util";
 import { useEffect, useRef, useState } from "react";
 import { Progress } from "@/components/ui/progress";
 import FileUpload from "./FileUpload";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { level1Params, level2Params, level3Params } from "./content";
+
+enum Level {
+  Level1 = "1",
+  Level2 = "2",
+  Level3 = "3",
+}
 
 export default function Component() {
   const [isLoading, setIsLoading] = useState(true);
@@ -12,16 +26,20 @@ export default function Component() {
   const [outputFileName, setOutputFileName] = useState("");
   const [isCompressing, setIsCompressing] = useState(false);
   const [compressionRatio, setCompressionRatio] = useState<number | null>(null);
+  const [level, setLevel] = useState<string>(Level.Level1);
 
   const load = async () => {
-    setIsLoading(true);
-    const baseURL = "https://unpkg.com/@ffmpeg/core@0.12.6/dist/umd";
+    const baseURL = "https://unpkg.com/@ffmpeg/core-mt@0.12.6/dist/esm";
     const ffmpeg = ffmpegRef.current;
     await ffmpeg.load({
       coreURL: await toBlobURL(`${baseURL}/ffmpeg-core.js`, "text/javascript"),
       wasmURL: await toBlobURL(
         `${baseURL}/ffmpeg-core.wasm`,
         "application/wasm"
+      ),
+      workerURL: await toBlobURL(
+        `${baseURL}/ffmpeg-core.worker.js`,
+        "text/javascript"
       ),
     });
     setIsLoading(false);
@@ -37,75 +55,26 @@ export default function Component() {
 
     await ffmpeg.writeFile(inputFileName, await fetchFile(file));
 
-    // 获取输入视频的信息
-    let videoInfo = "";
-    ffmpeg.on("log", ({ message }) => {
-      videoInfo += message + "\n";
-    });
+    const compressionParams =
+      level === Level.Level1
+        ? level1Params
+        : level === Level.Level2
+        ? level2Params
+        : level3Params;
 
-    await ffmpeg.exec(["-i", inputFileName]);
+    compressionParams[1] = file.name;
+    compressionParams[compressionParams.length - 1] = outputFileName;
 
-    // 解析视频信息以获取分辨率和比特率
-    const resolutionMatch = videoInfo.match(/(\d{3,4})x(\d{3,4})/);
-    const bitrateMatch = videoInfo.match(/bitrate: (\d+) kb\/s/);
+    console.log("compressionParams", compressionParams);
 
-    const inputWidth = resolutionMatch ? parseInt(resolutionMatch[1]) : 0;
-    const inputBitrate = bitrateMatch ? parseInt(bitrateMatch[1]) : 0;
-
-    console.log("====", {
-      inputWidth,
-      inputBitrate,
-      inputFileName,
-      outputFileName,
-      resolutionMatch,
-      bitrateMatch,
-    });
-
-    // 根据输入视频的特征决定压缩参数
-    let compressionParams = [];
-    if (inputWidth > 1280 || inputBitrate > 2000) {
-      compressionParams = [
-        "-i",
-        inputFileName,
-        "-c:v",
-        "libx264",
-        "-crf",
-        "28",
-        "-preset",
-        "veryfast",
-        "-c:a",
-        "aac",
-        "-b:a",
-        "96k",
-        "-movflags",
-        "+faststart",
-        "-f",
-        fileExtension,
-      ];
-    } else {
-      // 对于较小或质量较低的视频，也稍微增加压缩力度
-      compressionParams = [
-        "-i",
-        inputFileName,
-        "-c:v",
-        "libx264",
-        "-crf",
-        "23", // 增加CRF值
-        "-preset",
-        "veryfast", // 使用更快的预设
-        "-c:a",
-        "aac",
-        "-b:a",
-        "96k", // 降低音频比特率
-        "-f",
-        fileExtension,
-      ];
-    }
     ffmpeg.on("progress", ({ progress }) => {
       setProgress(Math.round(progress * 100));
     });
 
+    const start = Date.now();
     await ffmpeg.exec([...compressionParams, outputFileName]);
+    const end = Date.now();
+    console.log(`Compression took ${(end - start) / 1000} seconds`);
     const data = await ffmpeg.readFile(outputFileName);
 
     const originalSize = file.size;
@@ -149,6 +118,28 @@ export default function Component() {
   return (
     <div className="flex justify-center items-center min-h-screen">
       <div className="justify-center items-center flex flex-col overflow-y-auto gap-4 max-w-[1200px] w-full m-auto h-auto px-3 py-4">
+        <div>
+          <Select
+            defaultValue={Level.Level1}
+            onValueChange={(value) => setLevel(value)}
+          >
+            <SelectTrigger className="w-[280px]">
+              <SelectValue placeholder="Compression level" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="1">
+                Level 1
+                <span className="text-xs">(fastest,but not good quality)</span>
+              </SelectItem>
+              <SelectItem value="2">
+                Level 2 <span className="text-xs">(good quality)</span>
+              </SelectItem>
+              <SelectItem value="3">
+                Level 3 <span className="text-xs">(best quality)</span>
+              </SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
         {isCompressing ? (
           <>
             <Progress value={progress} />
