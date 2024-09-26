@@ -11,11 +11,18 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { level1Params, level2Params, level3Params } from "./content";
+import isMobile from "@/lib/ismobile";
 
 enum Level {
   Level1 = "1",
   Level2 = "2",
   Level3 = "3",
+}
+
+interface LoadURLs {
+  coreURL: string;
+  wasmURL: string;
+  workerURL?: string;
 }
 
 export default function Component() {
@@ -31,17 +38,25 @@ export default function Component() {
   const load = async () => {
     const baseURL = "/core";
     const ffmpeg = ffmpegRef.current;
-    await ffmpeg.load({
-      coreURL: await toBlobURL(`${baseURL}/ffmpeg-core.js`, "text/javascript"),
-      wasmURL: await toBlobURL(
-        `${baseURL}/ffmpeg-core.wasm`,
-        "application/wasm"
-      ),
-      workerURL: await toBlobURL(
+    const [coreURL, wasmURL] = await Promise.all([
+      toBlobURL(`${baseURL}/ffmpeg-core.js`, "text/javascript"),
+      toBlobURL(`${baseURL}/ffmpeg-core.wasm`, "application/wasm"),
+    ]);
+
+    const loadURLs: LoadURLs = {
+      coreURL,
+      wasmURL,
+    };
+
+    if (isMobile()) {
+      const workerURL = await toBlobURL(
         `${baseURL}/ffmpeg-core.worker.js`,
         "text/javascript"
-      ),
-    });
+      );
+      loadURLs.workerURL = workerURL;
+    }
+
+    await ffmpeg.load(loadURLs);
     setIsLoading(false);
   };
 
