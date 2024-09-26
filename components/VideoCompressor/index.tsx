@@ -36,24 +36,27 @@ export default function Component() {
   const [level, setLevel] = useState<string>(Level.Level1);
 
   const load = async () => {
-    const baseURL = "/core";
     const ffmpeg = ffmpegRef.current;
-    const [coreURL, wasmURL] = await Promise.all([
-      toBlobURL(`${baseURL}/ffmpeg-core.js`, "text/javascript"),
-      toBlobURL(`${baseURL}/ffmpeg-core.wasm`, "application/wasm"),
-    ]);
+    let loadURLs: LoadURLs = { coreURL: "", wasmURL: "" };
 
-    const loadURLs: LoadURLs = {
-      coreURL,
-      wasmURL,
-    };
-
-    if (isMobile()) {
+    if (!isMobile()) {
+      const baseURL = "/core-mt";
+      const [coreURL, wasmURL] = await Promise.all([
+        toBlobURL(`${baseURL}/ffmpeg-core.js`, "text/javascript"),
+        toBlobURL(`${baseURL}/ffmpeg-core.wasm`, "application/wasm"),
+      ]);
       const workerURL = await toBlobURL(
         `${baseURL}/ffmpeg-core.worker.js`,
         "text/javascript"
       );
-      loadURLs.workerURL = workerURL;
+      loadURLs = { coreURL, wasmURL, workerURL };
+    } else {
+      const baseURL = "/core";
+      const [coreURL, wasmURL] = await Promise.all([
+        toBlobURL(`${baseURL}/ffmpeg-core.js`, "text/javascript"),
+        toBlobURL(`${baseURL}/ffmpeg-core.wasm`, "application/wasm"),
+      ]);
+      loadURLs = { coreURL, wasmURL };
     }
 
     await ffmpeg.load(loadURLs);
