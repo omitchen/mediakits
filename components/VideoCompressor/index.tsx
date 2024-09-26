@@ -29,7 +29,7 @@ export default function Component() {
   const [level, setLevel] = useState<string>(Level.Level1);
 
   const load = async () => {
-    const baseURL = "https://unpkg.com/@ffmpeg/core-mt@0.12.6/dist/esm";
+    const baseURL = "/core";
     const ffmpeg = ffmpegRef.current;
     await ffmpeg.load({
       coreURL: await toBlobURL(`${baseURL}/ffmpeg-core.js`, "text/javascript"),
