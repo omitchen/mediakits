@@ -137,7 +137,8 @@ export default function Component() {
   return (
     <div className="flex justify-center items-center min-h-screen">
       <div className="justify-center items-center flex flex-col overflow-y-auto gap-4 max-w-[1200px] w-full m-auto h-auto px-3 py-4">
-        <div>
+        <h1 className="text-2xl font-bold">free video compressor</h1>
+        <div className="flex w-full justify-between">
           <Select
             defaultValue={Level.Level1}
             onValueChange={(value) => setLevel(value)}
