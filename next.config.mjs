@@ -9,7 +9,7 @@ const nextConfig = {
         headers: [
           {
             key: "Cross-Origin-Opener-Policy",
-            value: "same-origin",
+            value: "require-corp",
           },
           {
             key: "Cross-Origin-Embedder-Policy",
