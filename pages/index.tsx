@@ -14,7 +14,7 @@ import VideoCompressor from "@/components/VideoCompressor";
 //   weight: "100 900",
 // });
 
-export const runtime = "edge";
+export const runtime = "experimental-edge";
 
 export default function Home() {
   return (
