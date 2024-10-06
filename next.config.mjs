@@ -19,6 +19,11 @@ const nextConfig = {
       },
     ];
   },
+
+  swcMinify: true,
+  experimental: {
+    runtime: "experimental-edge",
+  },
 };
 
 export default nextConfig;
