@@ -20,10 +20,14 @@ const nextConfig = {
     ];
   },
 
-  swcMinify: true,
-  experimental: {
-    runtime: "experimental-edge",
-  },
+  // swcMinify: true,
+  // experimental: {
+  //   runtime: "experimental-edge",
+  // },
 };
+
+if (process.env.NODE_ENV === "development") {
+  await setupDevPlatform();
+}
 
 export default nextConfig;
