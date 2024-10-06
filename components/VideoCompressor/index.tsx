@@ -40,7 +40,7 @@ export default function Component() {
     let loadURLs: LoadURLs = { coreURL: "", wasmURL: "" };
 
     if (!isMobile()) {
-      const baseURL = "/core-mt";
+      const baseURL = "https://unpkg.com/@ffmpeg/core-mt@0.12.6/dist/umd";
       const [coreURL, wasmURL] = await Promise.all([
         toBlobURL(`${baseURL}/ffmpeg-core.js`, "text/javascript"),
         toBlobURL(`${baseURL}/ffmpeg-core.wasm`, "application/wasm"),
@@ -51,7 +51,7 @@ export default function Component() {
       );
       loadURLs = { coreURL, wasmURL, workerURL };
     } else {
-      const baseURL = "/core";
+      const baseURL = "https://unpkg.com/@ffmpeg/core@0.12.6/dist/umd";
       const [coreURL, wasmURL] = await Promise.all([
         toBlobURL(`${baseURL}/ffmpeg-core.js`, "text/javascript"),
         toBlobURL(`${baseURL}/ffmpeg-core.wasm`, "application/wasm"),
@@ -169,7 +169,7 @@ export default function Component() {
             </p>
           </>
         ) : (
-          <div className="md:w-[600px] w-full">
+          <div className="w-full">
             <FileUpload onChange={handleFileChange} />
           </div>
         )}
