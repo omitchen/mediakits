@@ -2,27 +2,37 @@ import { FFmpeg } from "@ffmpeg/ffmpeg";
 import { fetchFile, toBlobURL } from "@ffmpeg/util";
 import { useEffect, useRef, useState } from "react";
 import { Progress } from "@/components/ui/progress";
+import { DownloadIcon } from "@radix-ui/react-icons";
 import FileUpload from "./FileUpload";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import { level1Params, level2Params, level3Params } from "./content";
+// import {
+//   Select,
+//   SelectContent,
+//   SelectItem,
+//   SelectTrigger,
+//   SelectValue,
+// } from "@/components/ui/select";
+import { level1Params } from "./content";
 import isMobile from "@/lib/ismobile";
+import { cn } from "@/lib/utils";
+import { Button } from "@/components/ui/button";
 
-enum Level {
-  Level1 = "1",
-  Level2 = "2",
-  Level3 = "3",
-}
+// enum Level {
+//   Level1 = "1",
+//   Level2 = "2",
+//   Level3 = "3",
+// }
 
 interface LoadURLs {
   coreURL: string;
   wasmURL: string;
   workerURL?: string;
+}
+
+enum processStatus {
+  idle = "idle",
+  processing = "processing",
+  success = "success",
+  error = "error",
 }
 
 export default function Component() {
@@ -31,9 +41,9 @@ export default function Component() {
   const videoRef = useRef<HTMLVideoElement | null>(null);
   const [progress, setProgress] = useState(0);
   const [outputFileName, setOutputFileName] = useState("");
-  const [isCompressing, setIsCompressing] = useState(false);
+  const [process, setProcess] = useState<processStatus>(processStatus.idle);
   const [compressionRatio, setCompressionRatio] = useState<number | null>(null);
-  const [level, setLevel] = useState<string>(Level.Level1);
+  const [playable, setPlayable] = useState(true);
 
   const load = async () => {
     const ffmpeg = ffmpegRef.current;
@@ -73,13 +83,7 @@ export default function Component() {
 
     await ffmpeg.writeFile(inputFileName, await fetchFile(file));
 
-    const compressionParams =
-      level === Level.Level1
-        ? level1Params
-        : level === Level.Level2
-        ? level2Params
-        : level3Params;
-
+    const compressionParams = level1Params;
     compressionParams[1] = file.name;
     compressionParams[compressionParams.length - 1] = outputFileName;
 
@@ -117,13 +121,14 @@ export default function Component() {
     setCompressionRatio(null);
     setProgress(0);
     if (file) {
-      setIsCompressing(true);
+      setProcess(processStatus.processing);
       transcode(file)
+        .then(() => {
+          setProcess(processStatus.success);
+        })
         .catch((err) => {
           console.error("err", err);
-        })
-        .finally(() => {
-          setIsCompressing(false);
+          setProcess(processStatus.error);
         });
     }
   };
@@ -135,10 +140,18 @@ export default function Component() {
   if (isLoading) return <div>Loading...</div>;
 
   return (
-    <div className="flex justify-center items-center min-h-screen">
+    <div className="flex justify-center items-center min-h-screen pt-[var(--headerHeight)]">
       <div className="justify-center items-center flex flex-col overflow-y-auto gap-4 max-w-[1200px] w-full m-auto h-auto px-3 py-4">
-        <h1 className="text-2xl font-bold">free video compressor</h1>
-        <div className="flex w-full justify-between">
+        <h1 className="text-2xl font-bold">
+          Online Free Video Compression Tool
+        </h1>
+        <p>
+          <span className="font-bold">Save Space, Boost Efficiency!</span>
+          Use our online free video compression tool to quickly compress video
+          files, making it easy to upload and share while maintaining high
+          quality. (use desktop for best speed)
+        </p>
+        {/* <div className="flex w-full justify-between">
           <Select
             defaultValue={Level.Level1}
             onValueChange={(value) => setLevel(value)}
@@ -159,8 +172,8 @@ export default function Component() {
               </SelectItem>
             </SelectContent>
           </Select>
-        </div>
-        {isCompressing ? (
+        </div> */}
+        {process === processStatus.processing ? (
           <>
             <Progress value={progress} />
             <p className="leading-tight text-center">
@@ -186,13 +199,35 @@ export default function Component() {
           playsInline
           muted
           onError={() => {
-            const a = document.createElement("a");
-            a.href = videoRef.current?.src || "";
-            a.download = outputFileName;
-            a.click();
+            setPlayable(false);
           }}
-          className="max-w-[500px] max-h-[500px] w-full h-auto"
+          className={cn(
+            "max-w-[500px] max-h-[500px] w-full h-auto",
+            process === processStatus.success ? "block" : "hidden"
+          )}
         ></video>
+        {!playable && (
+          <p className="text-xs text-gray-400">
+            The browser does not support playing this format of video. You can
+            download it to your local computer for viewing.
+          </p>
+        )}
+        {process === processStatus.success && (
+          <Button
+            variant="outline"
+            size="lg"
+            className="max-w-[500px] w-full"
+            onClick={() => {
+              const a = document.createElement("a");
+              a.href = videoRef.current?.src || "";
+              a.download = outputFileName;
+              a.click();
+            }}
+          >
+            <DownloadIcon className="w-4 h-4 mr-2" />
+            Download
+          </Button>
+        )}
       </div>
     </div>
   );
