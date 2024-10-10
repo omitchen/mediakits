@@ -15,6 +15,7 @@ import { level1Params } from "./content";
 import isMobile from "@/lib/ismobile";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
+import Landing from "./landing";
 
 // enum Level {
 //   Level1 = "1",
@@ -141,8 +142,8 @@ export default function Component() {
 
   return (
     <div className="flex justify-center items-center min-h-screen pt-[var(--headerHeight)]">
-      <div className="justify-center items-center flex flex-col overflow-y-auto gap-4 max-w-[1200px] w-full m-auto h-auto px-3 py-4">
-        <h1 className="text-2xl font-bold">
+      <div className="justify-center items-center flex flex-col overflow-y-auto gap-4 max-w-[800px] w-full m-auto h-auto px-3 py-4">
+        <h1 className="text-3xl font-bold">
           Online Free Video Compression Tool
         </h1>
         <p>
@@ -228,6 +229,7 @@ export default function Component() {
             Download
           </Button>
         )}
+        <Landing />
       </div>
     </div>
   );
