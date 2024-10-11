@@ -3,8 +3,14 @@ import type { AppProps } from "next/app";
 import { Toaster } from "@/components/ui/sonner";
 import { ThemeProvider } from "@/components/csr/theme-provider";
 import { ModeToggle } from "@/components/csr/theme-toggle";
+import { initFirebase } from "@/utils/firebase";
+import { useEffect } from "react";
 
 export default function App({ Component, pageProps }: AppProps) {
+  useEffect(() => {
+    initFirebase();
+  }, []);
+
   return (
     <ThemeProvider
       attribute="class"
