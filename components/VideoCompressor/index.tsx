@@ -4,24 +4,12 @@ import { useEffect, useRef, useState } from "react";
 import { Progress } from "@/components/ui/progress";
 import { DownloadIcon } from "@radix-ui/react-icons";
 import FileUpload from "./FileUpload";
-// import {
-//   Select,
-//   SelectContent,
-//   SelectItem,
-//   SelectTrigger,
-//   SelectValue,
-// } from "@/components/ui/select";
 import { level1Params } from "./content";
 import isMobile from "@/lib/ismobile";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import Landing from "./landing";
-
-// enum Level {
-//   Level1 = "1",
-//   Level2 = "2",
-//   Level3 = "3",
-// }
+import Loading from "@/components/csr/loading";
 
 interface LoadURLs {
   coreURL: string;
@@ -138,8 +126,6 @@ export default function Component() {
     load();
   }, []);
 
-  if (isLoading) return <div>Loading...</div>;
-
   return (
     <div className="flex justify-center items-center min-h-screen pt-[var(--headerHeight)]">
       <div className="justify-center items-center flex flex-col overflow-y-auto gap-4 max-w-[800px] w-full m-auto h-auto px-3 py-4">
@@ -152,29 +138,14 @@ export default function Component() {
           files, making it easy to upload and share while maintaining high
           quality. (use desktop for best speed)
         </p>
-        {/* <div className="flex w-full justify-between">
-          <Select
-            defaultValue={Level.Level1}
-            onValueChange={(value) => setLevel(value)}
-          >
-            <SelectTrigger className="w-[280px]">
-              <SelectValue placeholder="Compression level" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="1">
-                Level 1
-                <span className="text-xs">(fastest,but not good quality)</span>
-              </SelectItem>
-              <SelectItem value="2">
-                Level 2 <span className="text-xs">(good quality)</span>
-              </SelectItem>
-              <SelectItem value="3">
-                Level 3 <span className="text-xs">(best quality)</span>
-              </SelectItem>
-            </SelectContent>
-          </Select>
-        </div> */}
-        {process === processStatus.processing ? (
+        {isLoading ? (
+          <div className="flex flex-col h-80 justify-center items-center">
+            <Loading />
+            <p className="text-gray-600">
+              Initialize the core module, Power by FFmpeg
+            </p>
+          </div>
+        ) : process === processStatus.processing ? (
           <>
             <Progress value={progress} />
             <p className="leading-tight text-center">
