@@ -10,6 +10,7 @@ import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import Landing from "./landing";
 import Loading from "@/components/csr/loading";
+import { convertBytesToAppropriateUnit } from "@/utils/conversion";
 
 interface LoadURLs {
   coreURL: string;
@@ -24,6 +25,11 @@ enum processStatus {
   error = "error",
 }
 
+interface BeforeAfterSize {
+  before: number;
+  after: number;
+}
+
 export default function Component() {
   const [isLoading, setIsLoading] = useState(true);
   const ffmpegRef = useRef(new FFmpeg());
@@ -31,7 +37,8 @@ export default function Component() {
   const [progress, setProgress] = useState(0);
   const [outputFileName, setOutputFileName] = useState("");
   const [process, setProcess] = useState<processStatus>(processStatus.idle);
-  const [compressionRatio, setCompressionRatio] = useState<number | null>(null);
+  const [beforeAfterSize, setBeforeAfterSize] =
+    useState<BeforeAfterSize | null>(null);
   const [playable, setPlayable] = useState(true);
 
   const load = async () => {
@@ -91,8 +98,13 @@ export default function Component() {
 
     const originalSize = file.size;
     const compressedSize = data.length;
-    const ratio = (1 - compressedSize / originalSize) * 100;
-    setCompressionRatio(parseFloat(ratio.toFixed(2)));
+    // const ratio = (1 - compressedSize / originalSize) * 100;
+    // setCompressionRatio(parseFloat(ratio.toFixed(2)));
+
+    setBeforeAfterSize({
+      before: originalSize,
+      after: compressedSize,
+    });
 
     if (videoRef.current) {
       const blob = new Blob([data], { type: `video/${fileExtension}` });
@@ -107,7 +119,7 @@ export default function Component() {
 
   const handleFileChange = async (file: File) => {
     setOutputFileName("");
-    setCompressionRatio(null);
+    setBeforeAfterSize(null);
     setProgress(0);
     if (file) {
       setProcess(processStatus.processing);
@@ -158,9 +170,16 @@ export default function Component() {
             <FileUpload onChange={handleFileChange} />
           </div>
         )}
-        {compressionRatio !== null && (
-          <p className="leading-tight text-center">
-            compress ratio: {compressionRatio}%
+        {beforeAfterSize !== null && (
+          <p className="leading-tight text-2xl text-center flex items-center">
+            original size:
+            <span className="line-through text-red-500">
+              {convertBytesToAppropriateUnit(beforeAfterSize.before)}
+            </span>
+            🪄 compressed size: ✨
+            <span className="font-bold text-green-500">
+              {convertBytesToAppropriateUnit(beforeAfterSize.after)} ✨
+            </span>{" "}
           </p>
         )}
         <video
