@@ -145,31 +145,35 @@ export default function Component() {
           Online Free Video Compression Tool
         </h1>
         <p>
-          <span className="font-bold">Save Space, Boost Efficiency!</span>
+          <span className="font-bold text-green">
+            Focus on privacy,Save Space, Boost Efficiency!
+          </span>{" "}
           Use our online free video compression tool to quickly compress video
           files, making it easy to upload and share while maintaining high
           quality. (use desktop for best speed)
         </p>
-        {isLoading ? (
-          <div className="flex flex-col h-80 justify-center items-center">
-            <Loading />
-            <p className="text-gray-600">
-              Initialize the core module, Power by FFmpeg
-            </p>
-          </div>
-        ) : process === processStatus.processing ? (
-          <>
-            <Progress value={progress} />
-            <p className="leading-tight text-center">
-              Compressing: {progress}% <br />
-              <span className="text-red-400">{`(please don't close this page)`}</span>
-            </p>
-          </>
-        ) : (
-          <div className="w-full">
-            <FileUpload onChange={handleFileChange} />
-          </div>
-        )}
+        <div className="flex h-[176px] w-full flex-col gap-2">
+          {isLoading ? (
+            <div className="flex flex-col justify-center items-center">
+              <Loading />
+              <p className="text-gray-600">
+                Initialize the core module, Power by FFmpeg
+              </p>
+            </div>
+          ) : process === processStatus.processing ? (
+            <>
+              <Progress value={progress} />
+              <p className="leading-tight text-center">
+                Compressing: {progress}% <br />
+                <span className="text-red-400">{`(please don't close this page)`}</span>
+              </p>
+            </>
+          ) : (
+            <div className="w-full">
+              <FileUpload onChange={handleFileChange} />
+            </div>
+          )}
+        </div>
         {beforeAfterSize !== null && (
           <p className="leading-tight text-2xl text-center flex items-center">
             original size:
@@ -177,7 +181,7 @@ export default function Component() {
               {convertBytesToAppropriateUnit(beforeAfterSize.before)}
             </span>
             🪄 compressed size: ✨
-            <span className="font-bold text-green-500">
+            <span className="font-bold text-green">
               {convertBytesToAppropriateUnit(beforeAfterSize.after)} ✨
             </span>{" "}
           </p>

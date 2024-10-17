@@ -2,6 +2,7 @@ import { Button } from "@/components/ui/button";
 import how1 from "@/assets/img/how1.png";
 import how2 from "@/assets/img/how2.png";
 import how3 from "@/assets/img/how3.png";
+import Image from "next/image";
 
 const Landing = () => {
   console.log(how1);
@@ -119,42 +120,51 @@ const Landing = () => {
                 behavior: "smooth",
               });
             }}
-            className="flex min-w-[84px] cursor-pointer max-w-[480px] items-center justify-center overflow-hidden rounded-xl h-10 px-4 @[480px]:h-12 @[480px]:px-5 bg-[#019863] hover:bg-[#019863]/90 text-[#FFFFFF] text-sm font-bold leading-normal tracking-[0.015em] @[480px]:text-base @[480px]:font-bold @[480px]:leading-normal @[480px]:tracking-[0.015em] w-fit"
+            className="flex min-w-[84px] cursor-pointer max-w-[480px] items-center justify-center overflow-hidden rounded-xl h-10 px-4 @[480px]:h-12 @[480px]:px-5 bg-green hover:bg-green/90 text-[#FFFFFF] text-sm font-bold leading-normal tracking-[0.015em] @[480px]:text-base @[480px]:font-bold @[480px]:leading-normal @[480px]:tracking-[0.015em] w-fit"
           >
             <span className="truncate">Try it now</span>
           </Button>
         </div>
         <div className="grid grid-cols-[repeat(auto-fit,minmax(158px,1fr))] gap-3">
           <div className="flex flex-col gap-3 pb-3">
-            <div
-              className="w-full bg-center bg-no-repeat aspect-video bg-cover rounded-xl"
-              style={{
-                backgroundImage: `url(${how1.src})`,
-              }}
-            ></div>
-            <p className="text-[#FFFFFF] text-base font-medium leading-normal">
+            <div className="w-full h-[135px] overflow-hidden rounded-xl">
+              <Image
+                src={how1}
+                className="w-full -translate-y-1/4"
+                width={240}
+                height={135}
+                alt="how2"
+              />
+            </div>
+            <p className="text-base font-medium leading-normal">
               Upload a video
             </p>
           </div>
           <div className="flex flex-col gap-3 pb-3">
-            <div
-              className="w-full bg-center bg-no-repeat aspect-video bg-cover rounded-xl"
-              style={{
-                backgroundImage: `url(${how2.src})`,
-              }}
-            ></div>
-            <p className="text-[#FFFFFF] text-base font-medium leading-normal">
+            <div className="w-full h-[135px] overflow-hidden rounded-xl">
+              <Image
+                src={how2}
+                className="w-full -translate-y-1/4"
+                width={240}
+                height={135}
+                alt="how2"
+              />
+            </div>
+            <p className="text-base font-medium leading-normal">
               Wait for the video to compress
             </p>
           </div>
           <div className="flex flex-col gap-3 pb-3">
-            <div
-              className="w-full bg-center bg-no-repeat aspect-video bg-cover rounded-xl"
-              style={{
-                backgroundImage: `url(${how3.src})`,
-              }}
-            ></div>
-            <p className="text-[#FFFFFF] text-base font-medium leading-normal">
+            <div className="w-full h-[135px] overflow-hidden rounded-xl">
+              <Image
+                src={how3}
+                className="w-full -translate-y-1/4"
+                width={240}
+                height={135}
+                alt="how2"
+              />
+            </div>
+            <p className="text-base font-medium leading-normal">
               Download your compressed video
             </p>
           </div>
